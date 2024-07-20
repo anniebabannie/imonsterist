@@ -12,14 +12,15 @@ export const POST: APIRoute = async ({ params, request }) => {
   }
 
   const filename = await uploadImage(blob);
-  const imageURL = `https://fly.storage.tigris.dev/${import.meta.env.BUCKET_NAME}/${filename}`;
+  const image = `https://fly.storage.tigris.dev/${import.meta.env.BUCKET_NAME}/${filename}`;
   
   let monster = null;
   try {
     monster = await analyzeMonster(blob);
     console.log(monster);
+    console.log(image);
     return new Response(
-      JSON.stringify({ monster, image: imageURL }),
+      JSON.stringify({ monster, image }),
       { status: 200 }
     )
   } catch (error) {

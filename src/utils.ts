@@ -2,6 +2,14 @@ import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Ollama } from "ollama";
 import { v4 as uuidv4 } from 'uuid';
 
+export type Monster = {
+  name:string,
+  description:string,
+  avgHeight:string,
+  diet:string,
+  environment:string,
+}
+
 export async function getBase64Image(blob: Blob) {
   let buffer = Buffer.from(await blob.arrayBuffer());
   return buffer.toString('base64');

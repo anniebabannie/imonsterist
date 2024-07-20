@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { useMutation } from "convex/react";
+import { api } from '../../convex/_generated/api';
+import type { Monster } from '../utils';
+import { ConvexClientProvider } from './ConvexClientProvider';
 
-type Monster = {
-  name:string,
-  description:string,
-  avgHeight:string,
-  diet:string,
-  environment:string,
-}
 
 function ImageUpload() {
   // Create state to store file
   const [file, setFile] = useState<File>();
   const [image, setImage] = useState("");
   const [monster, setMonster] = useState<Monster>();
+  const sendMonster = useMutation(api.monsters.send);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:Event) => {
     e.preventDefault();
     if (!file) {
       alert('Please select a file to upload.');
@@ -31,11 +29,11 @@ function ImageUpload() {
 
     const response = await resp.json();
     const m = JSON.parse(response.monster);
+    await sendMonster(m);
+    console.log(m);
     setMonster(m);
     setImage(response.image);
     console.log(response);
-    // setImage(response.image);
-    // setDesc(response.desc);
   }
 
   const handleFileChange = (e) => {
@@ -44,7 +42,6 @@ function ImageUpload() {
   };
 
   return (
-    <div className="App">
       <div>
         <form onSubmit={handleSubmit}>
           <input type="file" onChange={handleFileChange} />
@@ -58,13 +55,20 @@ function ImageUpload() {
               | Name | Description | Avg Height | Diet | Environment |
               | ---- | ----------- | --------- | ---- | ----------- |
               | ${monster?.name} | ${monster?.description} | ${monster?.avgHeight} | ${monster?.diet} | ${monster?.environment} |
-            `}
+              `}
           </Markdown>
         </div>
       </div>
-    </div>
+  );
+}
+
+function ImageUploadWrapped() {
+  return (
+    <ConvexClientProvider>
+      <ImageUpload />
+    </ConvexClientProvider>
   );
 }
 
 
-export default ImageUpload;
+export default ImageUploadWrapped;
